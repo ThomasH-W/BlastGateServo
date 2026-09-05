@@ -1,7 +1,7 @@
 # BlastGateServo
 Blast Gate w/ Servo and ESP32
 
-##Introduction
+## Introduction
 There are three blast gates in my little toolshop. After the first manual gate failed, I have replaced them with a automatic version.
 The housing is a 3D print. It will be moved by a servo mototr. The logic is inside of an ESP32 based on ESPHome.
 Example: when the drill press is turned on, the respective blast gate will be opened, all other will be closed and finally the vacuum system will be turned on.
@@ -23,6 +23,14 @@ I needed a cover to hide the ESP32 and mount a button. In addition it should pro
 ### Hardware
 The Wemos D1 Mini is small enough to be mounted into the cover.
 I have added a mosfet in order to control the power for the servo. I just do not want the servo to draw current when not being used.
+
+#### Servo
+AGFRC B53DHS SERVO
+https://www.agfrc.com/index.php?id=2488
+Stall Torque up to 24.0 kg·cm (333 oz·in) @8.4V  
+
+#### MOSFET
+Up to 20A / 5–26V
 
 ### Software
 My first approach was based on Tasmota but I did not not manage to handle the servos re shutter controls as documented. I switched to ESPHome and it works more reliable.
