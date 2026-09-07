@@ -76,6 +76,20 @@ mqtt:
     qos: 1
     retain: true
     
+  # subscribe to cmnd in order to open / close valve
+  on_message:
+    - topic: "${device_name}/cmnd"
+      then:
+        - lambda: |-
+            // Explicitly define the payload parameter to fix the scope error
+            [](std::string payload) {
+              if (payload == "OPEN") {
+                id(valve_switch).turn_on();
+              } else if (payload == "CLOSE") {
+                id(valve_switch).turn_off();
+              }
+            }(x); // Pass the trigger variable 'x' into the lambda        
+            
 script:
   - id: keep_alive_script
     mode: restart
@@ -159,7 +173,7 @@ switch:
       } else {
         return true;
       }
-    # Logik für das Schließen (Fahrt auf 360 Grad)
+    # Logik für das Schließen (Fahrt auf 180 Grad)
     turn_on_action:
       then:
         - switch.turn_on: relay
@@ -178,11 +192,22 @@ switch:
             state: true
         - switch.turn_off: relay
         - switch.turn_off: onboard_led
-    # Logik für das Öffnen (Fahrt auf 180 Grad)
+   # Logik für das Öffnen (Fahrt auf 360 Grad)
     turn_off_action:
       then:
         - switch.turn_on: relay
         - delay: 0.8s
         - switch.turn_on: onboard_led
         - globals.set:
-            id: target_angl
+            id: target_angle
+            value: '360.0'
+        - servo.write:
+            id: my_servo
+            level: 1.0 # Rückwärtslauf (oder angepasster Wert für Ihren Servo)
+        - delay: 0.8s
+        - component.update: servo_actual_position
+        - switch.template.publish:
+            id: valve_switch
+            state: false
+        - switch.turn_off: relay
+        - switch.turn_off: onboard_led
